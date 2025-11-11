@@ -1,0 +1,4 @@
+,rmse,mae,r2,model
+LinearRegression,45.746972667967384,35.437468594186385,0.2144015457269376,LinearRegression()
+RandomForest,23.122608658350018,17.837296620179853,0.799298989604184,"RandomForestRegressor(n_jobs=-1, random_state=42)"
+GradientBoosting,24.281578032868588,19.18630528683249,0.7786753856191794,GradientBoostingRegressor(random_state=42)

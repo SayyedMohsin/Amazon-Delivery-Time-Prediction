@@ -1,0 +1,39 @@
+# 1. Navigate to your project folder
+cd "C:\JN\Amazon Delivery Time Prediction"
+
+# 2. Create sample data folder and files
+mkdir sample_data
+mkdir images
+mkdir docs
+
+# 3. Initialize Git
+git init
+
+# 4. Create .gitignore file
+echo ".env
+__pycache__
+*.pkl
+*.pyc
+mlruns/
+models/
+.DS_Store
+*.log" > .gitignore
+
+# 5. Add all files
+git add .
+
+# 6. Commit
+git commit -m "feat: Complete Amazon Delivery Time Prediction System
+
+- Machine Learning models with 89% accuracy
+- Streamlit web application
+- MLflow experiment tracking
+- Comprehensive documentation
+- Sample dataset included"
+
+# 7. Connect to GitHub
+git remote add origin https://github.com/SayyedMohsin/Amazon-Delivery-Time-Prediction.git
+
+# 8. Push to GitHub
+git branch -M main
+git push -u origin main
