@@ -62,20 +62,6 @@ st.markdown("""
         text-align: center;
         margin: 2rem 0;
     }
-    .progress-bar {
-        width: 100%;
-        background-color: #f0f0f0;
-        border-radius: 10px;
-        margin: 1rem 0;
-    }
-    .progress-fill {
-        height: 20px;
-        background: linear-gradient(90deg, #4CAF50, #8BC34A);
-        border-radius: 10px;
-        text-align: center;
-        color: white;
-        line-height: 20px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -174,14 +160,21 @@ def train_model_automatically():
         df['Is_Weekend'] = (df['Order_DayOfWeek'] >= 5).astype(int)
         df['Processing_Time_Hours'] = np.random.uniform(0.5, 2.0, len(df))
         
-        # Encode categorical variables
+        # Encode categorical variables and create mapping dictionaries
         label_encoders = {}
+        encoding_mappings = {}
+        
         categorical_cols = ['Weather', 'Traffic', 'Vehicle', 'Area', 'Category']
         
         for col in categorical_cols:
             le = LabelEncoder()
             df[col + '_Encoded'] = le.fit_transform(df[col].astype(str))
             label_encoders[col] = le
+            
+            # Create mapping dictionary for this column
+            encoding_mappings[col] = {}
+            for category, encoded_value in zip(le.classes_, le.transform(le.classes_)):
+                encoding_mappings[col][category] = int(encoded_value)
         
         # Step 3: Train model
         status_placeholder.text("🤖 Step 3/3: Training machine learning model...")
@@ -218,7 +211,7 @@ def train_model_automatically():
             'best_model': 'RandomForest',
             'best_rmse': rmse,
             'r2_score': r2,
-            'label_encoders': label_encoders
+            'encoding_mappings': encoding_mappings  # Use mappings instead of label encoders
         }
         joblib.dump(model_info, 'models/model_info.pkl')
         
@@ -336,18 +329,23 @@ if model is not None:
     order_dayofweek = day_mapping[order_dow]
     is_weekend = 1 if order_dow in ['Saturday', 'Sunday'] else 0
     
-    # Encode categorical variables
-    label_encoders = model_info.get('label_encoders', {})
+    # Get encoding mappings (FIXED - using dictionaries instead of LabelEncoder objects)
+    encoding_mappings = model_info.get('encoding_mappings', {})
     
-    # Create feature array
+    # Create feature array (FIXED - using dictionary get method)
     input_features = np.array([[
-        distance, agent_age, agent_rating, order_hour, order_dayofweek,
-        label_encoders.get('Weather', {}).get(weather, 0),
-        label_encoders.get('Traffic', {}).get(traffic, 1),
-        label_encoders.get('Vehicle', {}).get(vehicle, 0),
-        label_encoders.get('Area', {}).get(area, 0),
-        label_encoders.get('Category', {}).get(category, 0),
-        processing_time, is_weekend
+        distance, 
+        agent_age, 
+        agent_rating, 
+        order_hour, 
+        order_dayofweek,
+        encoding_mappings.get('Weather', {}).get(weather, 0),
+        encoding_mappings.get('Traffic', {}).get(traffic, 1),
+        encoding_mappings.get('Vehicle', {}).get(vehicle, 0),
+        encoding_mappings.get('Area', {}).get(area, 0),
+        encoding_mappings.get('Category', {}).get(category, 0),
+        processing_time, 
+        is_weekend
     ]])
     
     # Prediction section
